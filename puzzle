@@ -1,0 +1,97 @@
+public partial class FormInput : Form
+{
+    private int n;
+
+    public FormInput()
+    {
+        InitializeComponent();
+    }
+
+    private void buttonNext_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            n = int.Parse(textBoxN.Text);
+            FormPuzzle formPuzzle = new FormPuzzle(n);
+            formPuzzle.Show();
+            this.Hide();
+        }
+        catch (FormatException)
+        {
+            MessageBox.Show("Please enter a valid integer for n.");
+        }
+    }
+}
+public partial class FormPuzzle : Form
+{
+    private int n;
+    private Button[,] buttons;
+    private int redCount;
+    private int blueCount;
+
+    public FormPuzzle(int n)
+    {
+        InitializeComponent();
+
+        this.n = n;
+        buttons = new Button[n, n];
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                Button button = new Button();
+                button.Width = 40;
+                button.Height = 40;
+                button.Top = i * button.Height + 50;
+                button.Left = j * button.Width + 50;
+                button.Click += new EventHandler(button_Click);
+                buttons[i, j] = button;
+                this.Controls.Add(button);
+            }
+        }
+
+        redCount = 0;
+        blueCount = n * n;
+        UpdateScoreboard();
+    }
+
+    private void button_Click(object sender, EventArgs e)
+    {
+        Button button = sender as Button;
+
+        if (button.BackColor == Color.White)
+        {
+            button.BackColor = Color.Red;
+            redCount++;
+            blueCount--;
+        }
+        else if (button.BackColor == Color.Red)
+        {
+            button.BackColor = Color.Blue;
+            redCount--;
+        }
+        else if (button.BackColor == Color.Blue)
+        {
+            button.BackColor = Color.White;
+            blueCount++;
+        }
+
+        UpdateScoreboard();
+        CheckWin();
+    }
+
+    private void UpdateScoreboard()
+    {
+        labelRedCount.Text = "Red Count: " + redCount.ToString();
+        labelBlueCount.Text = "Blue Count: " + (n * n - redCount).ToString();
+    }
+
+    private void CheckWin()
+    {
+        if (redCount == n * n || redCount == 0)
+        {
+            MessageBox.Show("Congratulations! You have won the game.");
+        }
+    }
+}
